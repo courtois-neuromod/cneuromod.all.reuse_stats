@@ -1,0 +1,9 @@
+*.csv
+*.png
+
+# panel_sizes.json is fully derived from figure_montage.svg (which is
+# tracked) and regenerated on every run — no need to also track it.
+figures/panel_sizes.json
+
+# Provenance is a tracked output: it records what produced everything else.
+!PROVENANCE.json

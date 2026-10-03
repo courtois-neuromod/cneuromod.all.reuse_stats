@@ -1,0 +1,77 @@
+{
+  "command": "/home/pbellec/git/airoh-mini/.venv/bin/invoke run",
+  "environment": {
+    "lockfiles": {
+      "environment.yml": "240993e42bc3a5a080735b449232ef6020f855afbd236f3330f5bf5ce44ad1be",
+      "requirements.txt": "66b0ee34be504a33a639c8b01da85c08f5ffcc4a199f601223a2a628794465d0",
+      "uv.lock": "79d3fe111a48b0597cb5360ee5a63f9e802f8f08ebcbb51b55249292ce6c7b11"
+    },
+    "packages": {
+      "airoh": "0.5.0",
+      "invoke": "3.0.3",
+      "jupyter": "1.1.1",
+      "matplotlib": "3.10.9",
+      "nbconvert": "7.17.1",
+      "pandas": "3.0.2",
+      "requests": "2.33.1"
+    },
+    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+    "python": "3.14.0"
+  },
+  "inputs": {
+    "assets": {
+      "papers": {
+        "commit": null,
+        "resolved_path": "/home/pbellec/git/airoh-mini/source_data/YNIMG_BrainParcellation_summary.tsv",
+        "sha256": "6eee27eb7ef7d280aa3ae5173e1e2abbb9c06ecfd77e99d2b0d7821633da16de"
+      }
+    },
+    "manifest_file": "source_data/MANIFEST.json",
+    "manifest_sha256": "0e29388df0642de2753c4994b85f3f570e54281988f01a6851def421460a6256"
+  },
+  "outputs": {
+    "figure_montage.png": {
+      "sha256": "cf882a4451ed2327a270aa58957d2c8dd36d83432f9686a60b23c9049af4bcd1",
+      "size_bytes": 47019
+    },
+    "figure_montage.svg": {
+      "sha256": "630c4ad8e50546071c596cbf8d1becf859abf57a792e8466ef43de100b75e0b6",
+      "size_bytes": 794
+    },
+    "figures/figure_simulation/histogram.png": {
+      "sha256": "04119ea7b302f8ab8f64054d3c26b250769a88bfa8b1a8302b25057205b25d10",
+      "size_bytes": 11361
+    },
+    "figures/figure_simulation/scatter.png": {
+      "sha256": "9d870a5a26d607953029646111fd155cffc00521103db9c6fc7d4e1b0cf0eb70",
+      "size_bytes": 17530
+    },
+    "figures/panel_sizes.json": {
+      "sha256": "0cf8f2f7117147be054ead5e34a884806ccee40315e76965853937a0df51e590",
+      "size_bytes": 127
+    },
+    "figures/summary/authors.csv": {
+      "sha256": "3bb51140343a796ae2b20c389345595b940828136d9232b8c325e25e0e6f87a3",
+      "size_bytes": 340
+    },
+    "simulation_output.csv": {
+      "sha256": "ed2f89d7873468b3d0d1a3fcb8a61121d6405f4fdb0e7d647c8adedc1af90586",
+      "size_bytes": 114
+    }
+  },
+  "recorded_at": "2026-08-04T14:19:14+00:00",
+  "repository": {
+    "branch": "figures-example",
+    "commit": "45b4c9df7e2c221e75446d36a7fb21ab5aaba82f",
+    "dirty": true,
+    "remote": "git@github.com:airoh-pipeline/airoh-mini.git",
+    "toplevel": "/home/pbellec/git/airoh-mini"
+  },
+  "schema": "airoh/provenance/1",
+  "tasks": [
+    "run-simulation",
+    "run-figure-layout",
+    "run-notebooks",
+    "compose-figure"
+  ]
+}

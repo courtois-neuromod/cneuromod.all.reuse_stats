@@ -1,0 +1,4 @@
+*.tsv
+
+# Provenance is tracked: it records what the inputs actually were.
+!MANIFEST.json

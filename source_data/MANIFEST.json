@@ -1,0 +1,19 @@
+{
+  "assets": {
+    "papers": {
+      "datalad_id": null,
+      "declared_source": "https://api.figshare.com/v2/file/download/9843721",
+      "exists": true,
+      "git": null,
+      "is_symlink": false,
+      "mode": "download",
+      "mtime": "2026-08-03T02:25:41+00:00",
+      "path": "source_data/YNIMG_BrainParcellation_summary.tsv",
+      "resolved_path": "/home/pbellec/git/airoh-mini/source_data/YNIMG_BrainParcellation_summary.tsv",
+      "sha256": "6eee27eb7ef7d280aa3ae5173e1e2abbb9c06ecfd77e99d2b0d7821633da16de",
+      "size_bytes": 65443
+    }
+  },
+  "recorded_at": "2026-08-04T14:19:06+00:00",
+  "schema": "airoh/manifest/1"
+}

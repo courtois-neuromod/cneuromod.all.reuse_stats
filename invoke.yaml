@@ -1,0 +1,82 @@
+# invoke.yaml
+
+# Notebooks folders
+notebooks_dir: notebooks
+
+# source data folders
+source_data_dir: source_data
+
+# output data folders
+output_data_dir: output_data
+
+# figures base dir — each notebook writes into figures_dir/<notebook_stem>/,
+# which airoh also uses as the "already ran" sentinel for that notebook.
+figures_dir: output_data/figures
+
+# Composed demo figure — the worked example of the airoh.figures Inkscape
+# montage pattern (see CLAUDE.md, "Figures: the Inkscape montage pattern").
+#
+# `svg` is a pipeline *source*, hand-authored in Inkscape, even though it
+# lives under output_data/ — it has to, because it links the notebook panels
+# by relative path and those links resolve from its own directory. It is also
+# the single source of truth for panel geometry: `run-figure-layout` reads each
+# placed box out of it into figures_dir/panel_sizes.json, and the notebook
+# renders each panel at exactly that size. `compose-figure` then renders it
+# with the Inkscape CLI, an optional external dependency (see README.md).
+figures:
+  figure_montage:
+    svg: output_data/figure_montage.svg
+    output: output_data/figure_montage.png
+    dpi: 300
+
+# provenance records
+#
+# Written by `fetch` and `run` (see airoh.provenance). Both are git-tracked:
+# they are small, and they are the only record of what produced a result when
+# datalad is not in play. PROVENANCE.json is *expected* to change on every run
+# — that churn is the record doing its job, not a bug to fix.
+manifest_file: source_data/MANIFEST.json
+provenance_file: output_data/PROVENANCE.json
+# Files above this size record their metadata but no checksum, so one large
+# asset cannot make every fetch crawl.
+provenance_hash_max_bytes: 104857600
+
+# `invoke verify` settings — all optional; delete this block to accept the
+# defaults. See CLAUDE.md, "Verification".
+verify:
+  # Check names to skip entirely, e.g. [lint, tracked_size].
+  skip_checks: []
+  # Glob patterns exempt from the path and tracked-file checks.
+  # ruff.toml: CLAUDE.md mentions it conditionally (only non-uv projects
+  # have it), which otherwise trips the doc_paths check in this uv project.
+  ignore_paths: [ruff.toml]
+  # Largest file git may track before the check fails (default 10 MB).
+  max_tracked_bytes: 10485760
+
+# file sources
+#
+# Each asset defines `output_file` plus `url` and/or `source`:
+#   - `url`    : download the file over HTTP into `output_file`
+#   - `source` : path to already-present data to symlink into `output_file`
+#                instead of downloading (a per-asset alternative to the
+#                `invoke fetch-{name} --source ...` flag)
+files:
+  papers:
+    url: https://api.figshare.com/v2/file/download/9843721
+    output_file: source_data/YNIMG_BrainParcellation_summary.tsv
+    # source: /path/to/existing/file.tsv   # symlink instead of downloading
+
+# datalad datasets (optional)
+#
+# For a real datalad dataset (as opposed to a plain file/folder under
+# `files:`), use `airoh.datalad` instead of `airoh.acquisition.fetch_data` —
+# see CLAUDE.md, "Datalad datasets, and plain assets". Each entry supports
+# `output_dir` (where the dataset checkout lives), `url` (to `datalad clone`),
+# and `source` (an existing checkout to symlink instead). A plain
+# `{name: output_dir}` string is also accepted.
+#
+# datasets:
+#   cneuromod:
+#     output_dir: source_data/cneuromod.all
+#     url: https://github.com/courtois-neuromod/cneuromod.all.git
+#     # source: /data/cneuromod.all   # symlink an existing checkout instead
