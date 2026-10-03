@@ -42,6 +42,61 @@
           "dirty": true
         }
       }
+    },
+    {
+      "timestamp": "2026-10-03T14:56:37-04:00",
+      "since": "2026-05-04",
+      "sources": [
+        "europepmc",
+        "openalex",
+        "arxiv"
+      ],
+      "queries": [
+        "cneuromod",
+        "Courtois NeuroMod",
+        "cneuromod.ca",
+        "algonauts 2025"
+      ],
+      "smoke": false,
+      "hit_counts": {
+        "europepmc": {
+          "cneuromod": 2,
+          "Courtois NeuroMod": 4,
+          "cneuromod.ca": 0,
+          "algonauts 2025": 0
+        },
+        "openalex": {
+          "cneuromod": 7,
+          "Courtois NeuroMod": 9,
+          "cneuromod.ca": 0,
+          "algonauts 2025": 24
+        },
+        "arxiv": {
+          "cneuromod": 0,
+          "Courtois NeuroMod": 0,
+          "cneuromod.ca": 0,
+          "algonauts 2025": 2
+        }
+      },
+      "n_raw": 48,
+      "n_after_dedup": 25,
+      "n_new": 23,
+      "git": {
+        "this_repo": {
+          "toplevel": "/home/pbellec/git/cneuromod.all.reuse_stats",
+          "commit": "5d1ba0431dc21d49c465418474ef0870d43592fa",
+          "branch": "main",
+          "remote": "git@github.com:courtois-neuromod/cneuromod.all.reuse_stats.git",
+          "dirty": true
+        },
+        "cneuromod_all": {
+          "toplevel": "/home/pbellec/git/cneuromod.all",
+          "commit": "7fa33802541832db18ae23960ec0560cb83061a1",
+          "branch": "use-stats-deploy-key",
+          "remote": "git@github.com:courtois-neuromod/cneuromod.all.git",
+          "dirty": true
+        }
+      }
     }
   ]
 }
