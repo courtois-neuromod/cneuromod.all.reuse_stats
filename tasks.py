@@ -236,6 +236,147 @@ def verify(c, skip=None, strict=False):
     airoh_verify(c, skip=skip, strict=strict)
 
 # --------------------------------------------------------------------------- #
+# Literature curation
+# --------------------------------------------------------------------------- #
+# Not part of `run`: network-bound, non-deterministic and outward-facing (it opens a PR).
+# Claude drives these in a session, the user approves each addition. See the
+# literature-search skill and literature_search/README.md.
+SIDECAR_PATH = "docs/source/cneuromod_references.json"
+
+
+def literature_settings(c):
+    """The `literature_search:` block of invoke.yaml."""
+    return c.config.get("literature_search")
+
+
+def require_bib(c):
+    """Path of the reference list; stops and points at `invoke fetch` if it is not on disk."""
+    bib_path = cneuromod_bib_path(c)
+    if not bib_path.is_file():
+        raise SystemExit(f"❌ {bib_path} is missing or has no content — run `invoke fetch` first.")
+    return bib_path
+
+
+@task(help={
+    "since": "Only papers published on/after this date (YYYY-MM-DD). "
+             "Default: the SearchDate in cneuromod_references.json.",
+    "smoke": "One query, 3 results per source, for a fast plumbing check.",
+})
+def lit_search(c, since=None, smoke=False):
+    """
+    Search Europe PMC, OpenAlex and arXiv for new CNeuroMod papers.
+
+    Deduplicates against the reference list and past decisions, drafts BibTeX, and
+    writes literature_search/<today>/. Re-running the same day adds to that session
+    and never touches decisions.
+    """
+    from analysis.literature_curation import search_session
+
+    bib_path = require_bib(c)
+    settings = literature_settings(c)
+    summary = search_session(bib_path, bib_path.with_name("cneuromod_references.json"),
+                             settings["log_dir"], settings, since=since, smoke=smoke)
+    print(f"🔎 since {summary['since']}: {summary['n_raw']} hits → "
+          f"{summary['n_after_dedup']} after dedup, {summary['n_new']} new")
+    print("   Next: `invoke lit-status`")
+
+
+@task(help={
+    "title": "Paper title (required).",
+    "doi": "DOI, if known (the BibTeX is then fetched from doi.org).",
+    "url": "Link to the paper.",
+    "query": "The web search that found it.",
+    "authors": "Authors separated by ' and ' (optional).",
+    "year": "Publication year (optional).",
+    "venue": "Journal or preprint server (optional).",
+})
+def lit_candidate(c, title, doi=None, url=None, query=None, authors=None, year=None, venue=None):
+    """Register a paper found by web search as a candidate (dedup, draft BibTeX, log)."""
+    from analysis.literature_curation import register_candidate
+
+    candidate = {
+        "title": title, "doi": doi, "url": url or "", "query": query, "arxiv_id": None,
+        "authors": authors.split(" and ") if authors else [],
+        "year": int(year) if year else None, "venue": venue or "", "source": ["websearch"],
+        "matched_snippet": "",
+    }
+    print(register_candidate(require_bib(c), literature_settings(c)["log_dir"], candidate))
+
+
+@task(help={"session": "Session date (YYYY-MM-DD). Default: today."})
+def lit_status(c, session=None):
+    """Print the candidates still awaiting a decision, with their draft BibTeX."""
+    from analysis import curation_log as log
+    from analysis.literature_curation import today
+
+    log_dir = literature_settings(c)["log_dir"]
+    waiting = log.pending(log_dir, session or today())
+    print(f"📋 {len(waiting)} candidate(s) awaiting a decision")
+    for candidate in waiting:
+        print(f"\n── {candidate['id']}\n   {candidate['title']}\n   "
+              f"{candidate.get('venue') or '?'} ({candidate.get('year') or '?'}) · "
+              f"found by {', '.join(candidate.get('found_by', []))}\n   "
+              f"{candidate.get('url') or ''}\n   “{candidate.get('matched_snippet', '')}”\n"
+              f"{candidate.get('bibtex', '')}")
+
+
+@task(help={
+    "id": "Candidate id, as printed by lit-status (required).",
+    "decision": "accept, reject or defer (required).",
+    "reason": "Why, in a sentence (required).",
+    "bibtex_file": "File with a corrected BibTeX entry, replacing the draft.",
+    "session": "Session date holding the candidate (default: newest that has it).",
+})
+def lit_decide(c, id, decision, reason, bibtex_file=None, session=None):
+    """Record a human decision on a candidate in literature_search/decisions.jsonl."""
+    from analysis.literature_curation import decide
+
+    if decision not in ("accept", "reject", "defer"):
+        raise SystemExit("❌ --decision must be accept, reject or defer.")
+    record = decide(literature_settings(c)["log_dir"], id, decision, reason,
+                    bibtex_file=bibtex_file, session=session)
+    print(f"📝 {record['decision']}: {record['candidate_id']}")
+
+
+@task(help={"dry_run": "Print the diff and PR body; push nothing."})
+def lit_propose(c, dry_run=False):
+    """
+    Add accepted candidates to cneuromod.all through a pull request.
+
+    Works in a temporary git worktree cut from origin/<pr_base>, so your cneuromod.all
+    checkout keeps its branch and working tree. Pushes a branch and opens the PR
+    (outward-facing: preview with --dry-run first), then logs the PR URL.
+    """
+    from analysis.literature_curation import propose_accepted
+
+    settings = literature_settings(c)
+    require_bib(c)
+    dataset = c.config.get("datasets")["cneuromod"]
+    repo = dataset["output_dir"] if isinstance(dataset, dict) else dataset
+    result = propose_accepted(repo, settings["log_dir"], base=settings["pr_base"], dry_run=dry_run)
+    if result and result["pr_url"]:
+        print(f"🚀 {result['pr_url']}")
+
+
+@task(help={"session": "Session date to remove (YYYY-MM-DD, required)."})
+def clean_lit_search(c, session):
+    """
+    Remove one literature_search/<date>/ session folder.
+
+    Never touches decisions.jsonl, and is not called by `clean`: the log is a record,
+    not a computed output.
+    """
+    import shutil
+
+    folder = Path(literature_settings(c)["log_dir"]) / session
+    if folder.is_dir():
+        shutil.rmtree(folder)
+        print(f"🧹 Removed {folder}")
+    else:
+        print(f"🫧 Skipping: {folder} does not exist.")
+
+
+# --------------------------------------------------------------------------- #
 # Clean
 # --------------------------------------------------------------------------- #
 @task

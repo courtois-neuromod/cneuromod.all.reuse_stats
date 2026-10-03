@@ -1,0 +1,47 @@
+{
+  "runs": [
+    {
+      "timestamp": "2026-10-03T14:37:12-04:00",
+      "since": "2026-05-04",
+      "sources": [
+        "europepmc",
+        "openalex",
+        "arxiv"
+      ],
+      "queries": [
+        "cneuromod"
+      ],
+      "smoke": true,
+      "hit_counts": {
+        "europepmc": {
+          "cneuromod": 2
+        },
+        "openalex": {
+          "cneuromod": 3
+        },
+        "arxiv": {
+          "cneuromod": 0
+        }
+      },
+      "n_raw": 5,
+      "n_after_dedup": 2,
+      "n_new": 2,
+      "git": {
+        "this_repo": {
+          "toplevel": "/home/pbellec/git/cneuromod.all.reuse_stats",
+          "commit": "d3f5386c28ad011e9962e3b8a1557faff1d01a08",
+          "branch": "main",
+          "remote": "git@github.com:courtois-neuromod/cneuromod.all.reuse_stats.git",
+          "dirty": true
+        },
+        "cneuromod_all": {
+          "toplevel": "/home/pbellec/git/cneuromod.all",
+          "commit": "7fa33802541832db18ae23960ec0560cb83061a1",
+          "branch": "use-stats-deploy-key",
+          "remote": "git@github.com:courtois-neuromod/cneuromod.all.git",
+          "dirty": true
+        }
+      }
+    }
+  ]
+}

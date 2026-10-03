@@ -64,3 +64,14 @@ datasets:
     output_dir: source_data/cneuromod.all
     url: https://github.com/courtois-neuromod/cneuromod.all.git
     # source: ../cneuromod.all   # symlink an existing checkout instead
+
+# Literature curation (`lit-*` tasks; deliberately not part of `invoke run`).
+# Searches open scholarly APIs for new papers, logs every search and decision under
+# `log_dir` (git-tracked), and opens a PR on cneuromod.all for the approved ones.
+literature_search:
+  log_dir: literature_search
+  queries: ["cneuromod", "Courtois NeuroMod", "cneuromod.ca", "algonauts 2025"]
+  sources: [europepmc, openalex, arxiv]
+  max_results_per_query: 100
+  contact_email: lune.bellec@gmail.com   # sent to the APIs as a polite-pool contact
+  pr_base: main

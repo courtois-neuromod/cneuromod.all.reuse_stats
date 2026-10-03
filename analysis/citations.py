@@ -56,16 +56,21 @@ def parse_fields(fields_text: str) -> dict:
     return fields
 
 
+def iter_bib_entries(bib_text: str):
+    """Yield (entry_type, key, fields) for each BibTeX entry in *bib_text*."""
+    for match in re.finditer(r"@(\w+)\{([^,]+),(.*?)\n\}", bib_text, re.DOTALL):
+        yield match.group(1), match.group(2), parse_fields(match.group(3))
+
+
 def parse_bib_entries(bib_path: Path) -> list[dict]:
     """One record per BibTeX entry, with its `year` (or None) and publication `type`."""
     text = Path(bib_path).read_text(encoding="utf-8")
     records = []
-    for match in re.finditer(r"@(\w+)\{([^,]+),(.*?)\n\}", text, re.DOTALL):
-        fields = parse_fields(match.group(3))
+    for entry_type, _key, fields in iter_bib_entries(text):
         year = fields.get("year", "")
         records.append({
             "year": int(year) if year.isdigit() else None,
-            "type": classify_entry(match.group(1), fields),
+            "type": classify_entry(entry_type, fields),
         })
     return records
 

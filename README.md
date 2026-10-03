@@ -54,6 +54,22 @@ Steps whose output already exists are skipped. Caching is by existence, not cont
 
 ---
 
+## Curate the reference list
+
+New papers using CNeuroMod data are found and added back to `cneuromod.all` through a pull request. This is a conversation between you and Claude, not part of `invoke run`: it needs the network and ends by pushing a branch.
+
+```bash
+invoke lit-search                 # Europe PMC, OpenAlex, arXiv since the last SearchDate
+invoke lit-status                 # candidates awaiting a decision, with draft BibTeX
+invoke lit-decide --id ID --decision accept --reason "uses the Friends data"
+invoke lit-propose --dry-run      # preview the bib diff and PR body
+invoke lit-propose                # push a branch and open the PR on cneuromod.all
+```
+
+Claude also runs web searches and registers hits with `lit-candidate`; the `literature-search` skill describes the whole session. Every search and decision is logged in [`literature_search/`](literature_search/README.md), which you commit like code. `lit-propose` works in a temporary git worktree, so your own `cneuromod.all` checkout keeps its branch and files.
+
+---
+
 ## Check that everything still agrees
 
 ```bash
@@ -87,11 +103,17 @@ Run both before committing. `verify` is deliberately not part of `invoke run`.
 | `run-notebooks`     | Executes notebooks and saves figures to `output_data/figures/` |
 | `compose-figure`    | Renders `figure_montage.svg` to PNG with Inkscape (optional binary) |
 | `run-smoke`         | Fast end-to-end pass on a few references; cleans outputs before and after |
+| `lit-search`        | Searches Europe PMC, OpenAlex and arXiv for new CNeuroMod papers; logs a session in `literature_search/` |
+| `lit-candidate`     | Registers a paper found by web search as a candidate     |
+| `lit-status`        | Prints candidates awaiting a decision, with draft BibTeX |
+| `lit-decide`        | Records an accept / reject / defer decision in `decisions.jsonl` |
+| `lit-propose`       | Opens a PR on cneuromod.all adding the accepted papers; `--dry-run` previews |
 | `verify`            | Checks that code, config, data and docs still agree      |
 | `clean`             | Removes all computed outputs                             |
 | `clean-citations`   | Removes `cneuromod_citations.csv`                        |
 | `clean-figures`     | Removes the figures dir (panels, notebook sentinels, panel_sizes.json) |
 | `clean-figure`      | Removes the composed montage PNG (never the hand-authored SVG) |
+| `clean-lit-search`  | Removes one dated session folder of `literature_search/` (never `decisions.jsonl`) |
 | `clean-source`      | Removes all source data assets; routes to each `clean-{name}` |
 | `clean-cneuromod`   | Removes the cneuromod.all symlink (never a real clone)   |
 
@@ -112,6 +134,7 @@ Use `invoke --list` or `invoke --help <task>` for details.
 | -------------- | ---------------------------------------- |
 | `analysis/`    | Pure Python analysis logic, called by invoke tasks |
 | `notebooks/`   | Jupyter notebooks for visualization (one per figure) |
+| `literature_search/` | Log of literature searches and curation decisions — see [`literature_search/README.md`](literature_search/README.md) |
 | `tests/`       | Unit tests for `analysis/` (pytest)      |
 | `source_data/` | Inputs — see [`source_data/CONTENT.md`](source_data/CONTENT.md) |
 | `output_data/` | Generated results and figures — see [`output_data/CONTENT.md`](output_data/CONTENT.md) |
