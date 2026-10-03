@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is the `airoh-mini` template — a starting point for structuring a reproducible data analysis. It is built on the [`invoke`](https://www.pyinvoke.org/) task runner. The `airoh` pip package provides reusable invoke tasks; this repo customizes them via `tasks.py` and `invoke.yaml`.
+This project measures how much the CNeuroMod dataset is reused: it counts papers using CNeuroMod data, by year and publication type, from the curated reference list `source_data/cneuromod.all/docs/source/cneuromod_references.bib` in the `cneuromod.all` datalad dataset (usually a symlink to an existing checkout). The pipeline is `run-citations` (`analysis/citations.py` → `output_data/cneuromod_citations.csv`), then `notebooks/cneuromod_citations.ipynb`, which draws the one montage panel. `cneuromod.all` is meant to become a write target too (new publications added back to its reference list), but no step does that yet. The citation code was ported from the sibling `dataset_comparison` project.
+
+It was started from the `airoh-mini` template and is built on the [`invoke`](https://www.pyinvoke.org/) task runner. The `airoh` pip package provides reusable invoke tasks; this repo customizes them via `tasks.py` and `invoke.yaml`. Unit tests live in `tests/` (pytest; `testpaths` is pinned in `pyproject.toml` because collection would otherwise crawl the dataset symlink).
 
 ## Persona
 
@@ -87,7 +89,7 @@ When results start looking stale or inconsistent, reach for `--force` rather tha
 
 **Notebook outputs must live in the notebook's own folder.** `run-notebooks` treats `{figures_base}/{notebook_stem}/` as the "already ran" marker for each notebook. A notebook that writes anywhere else never creates its marker and therefore re-runs on every single `invoke run`, however cheap the rest of the pipeline is.
 
-**Figures: the Inkscape montage pattern.** `output_data/figure_montage.svg` is hand-authored in Inkscape and is the **single source of truth for panel layout** — it links each notebook panel by relative path resolved from `output_data/` (e.g. `output_data/figures/figure_simulation/scatter.png`), and the box it places a panel in is that panel's true on-page size. `run-figure-layout` (`airoh.figures.figure_layout`) reads those boxes out of every entry in `invoke.yaml`'s `figures:` mapping and writes them to `output_data/figures/panel_sizes.json` on **every** `invoke run`; `figure_simulation.ipynb` calls `airoh.figures.panel_size(name, default)` to render each panel at exactly that size, so placement is 1:1 and text is never stretched. `compose-figure` (`airoh.figures.compose_figure`) then renders the montage to `figure_montage.png` via the Inkscape CLI, an optional system binary: a missing `inkscape` warns and skips the export rather than failing `invoke run`.
+**Figures: the Inkscape montage pattern.** `output_data/figure_montage.svg` is hand-authored in Inkscape and is the **single source of truth for panel layout** — it links each notebook panel by relative path resolved from `output_data/` (e.g. `output_data/figures/cneuromod_citations/citations_by_year.png`), and the box it places a panel in is that panel's true on-page size. `run-figure-layout` (`airoh.figures.figure_layout`) reads those boxes out of every entry in `invoke.yaml`'s `figures:` mapping and writes them to `output_data/figures/panel_sizes.json` on **every** `invoke run`; `notebooks/cneuromod_citations.ipynb` calls `airoh.figures.panel_size(name, default)` to render each panel at exactly that size, so placement is 1:1 and text is never stretched. `compose-figure` (`airoh.figures.compose_figure`) then renders the montage to `figure_montage.png` via the Inkscape CLI, an optional system binary: a missing `inkscape` warns and skips the export rather than failing `invoke run`.
 
 Resizing a box only fully takes effect after the panel it belongs to is re-rendered — and that panel is a notebook output, so it obeys the same existence-based caching as everything else (see **Caching is by existence**, above). `panel_sizes.json` and the composed montage update on every `invoke run` regardless, but a panel whose notebook did *not* re-run keeps its old pixel size, so Inkscape stretches it into the new box — precisely the problem this pattern exists to avoid. After resizing a box, run `invoke clean-figures && invoke run` (or `invoke run --force`) so the affected panel actually redraws at the new size.
 
@@ -259,12 +261,6 @@ called.
 **Linting:** The project linter and its configuration are chosen during `init` and stored in `pyproject.toml` or `ruff.toml`, depending on the package manager chosen at init (see **Setup** — only the `uv` path keeps `pyproject.toml`). Run it before committing. Never disable a lint rule without a comment explaining why.
 
 **Testing:** Two baseline checks, and they cover different failures. `invoke run-smoke` is the behavioural one: does the pipeline run end to end and produce something. `invoke verify` is the structural one: do the code, config, data and docs still describe the same project. Run both before committing; neither substitutes for the other. Add unit tests in a tests directory, using the project's chosen test framework, when a function contains non-trivial logic, has edge cases the smoke test won't catch, or is shared across multiple steps. Unit tests are optional for simple glue/orchestration code but encouraged for any pure transformation or computation logic in `analysis/`. The test framework and directory are configured during `init`.
-
-**Template cleanup:** When starting a new project from this template, remove the demo code before adding project-specific work:
-- Delete `run_simulation` from `tasks.py` and remove it from the `pre=` chains on `run_notebooks` and `run`
-- Delete `analysis/simulation.py` (and the `analysis/` folder if it stays empty)
-- Clear or replace `source_data/CONTENT.md` and `output_data/CONTENT.md` with project-specific descriptions
-- Update `invoke.yaml` (`files:`, paths) for the new project's data sources
 
 **Adding a new analysis step:** add a function to `analysis/`, add a `run-{name}` task and a matching `clean-{name}` task in `tasks.py`, call both from the bodies of the top-level `run` and `clean` tasks (see the `pre=` warning above — a body call, not `pre=`), and create or extend a notebook in `notebooks/` for visualization.
 

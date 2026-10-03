@@ -2,26 +2,44 @@ from pathlib import Path
 
 from invoke import task
 
-
 # --------------------------------------------------------------------------- #
 # Fetch
 # --------------------------------------------------------------------------- #
-@task(help={
-    "source": "Path to already-present 'papers' data to symlink instead of downloading.",
-    "copy": "Copy the source data instead of symlinking it.",
-})
-def fetch_papers(c, source=None, copy=False):
-    """
-    Retrieve the 'papers' asset (download, or symlink/copy existing data).
-    """
-    from airoh.acquisition import fetch_data
-    fetch_data(c, "papers", source=source, copy=copy)
+# Files of cneuromod.all this project reads (relative to the dataset root).
+# They are annexed there, so a fresh clone has the tree but not the content.
+CNEUROMOD_BIB = "docs/source/cneuromod_references.bib"
+CNEUROMOD_REFERENCE_FILES = [
+    CNEUROMOD_BIB,
+    "docs/source/cneuromod_references.json",
+]
+
 
 @task(help={
-    "papers_source": "Path to existing 'papers' data to symlink instead of downloading.",
-    "copy": "Copy source data instead of symlinking it.",
+    "source": "Existing cneuromod.all checkout to symlink instead of cloning "
+              "(e.g. ../cneuromod.all, or the parent repo when used as a subrepo).",
 })
-def fetch(c, papers_source=None, copy=False):
+def fetch_cneuromod(c, source=None):
+    """
+    Make cneuromod.all available and retrieve the reference list.
+
+    cneuromod.all is both a source (its citation list is read here) and a
+    future target (new publications will be written back to it), so the checkout is
+    never copied: it is either a fresh `datalad clone` or a symlink to the
+    checkout you already have. Only the reference files are retrieved, not the
+    dataset content. Tolerant of partial failures: a file that cannot be
+    reached warns and is skipped.
+    """
+    from airoh.datalad import get_data, install_dataset
+
+    install_dataset(c, "cneuromod", source=source)
+    for reference_file in CNEUROMOD_REFERENCE_FILES:
+        get_data(c, "cneuromod", path=reference_file)
+
+
+@task(help={
+    "cneuromod_source": "Existing cneuromod.all checkout to symlink instead of cloning.",
+})
+def fetch(c, cneuromod_source=None):
     """
     Retrieve all data assets. Each asset has its own fetch-{name} task; this
     umbrella task routes a per-asset --{name}-source flag to the matching one.
@@ -32,31 +50,52 @@ def fetch(c, papers_source=None, copy=False):
     """
     from airoh.provenance import record_sources
 
-    fetch_papers(c, source=papers_source, copy=copy)
+    fetch_cneuromod(c, source=cneuromod_source)
     record_sources(c)
 
 # --------------------------------------------------------------------------- #
 # Analysis steps
 # --------------------------------------------------------------------------- #
-@task(help={"seed": "Seed for the random generator (default: 0)."})
-def run_simulation(c, seed=None):
+CITATIONS_CSV = "cneuromod_citations.csv"
+SMOKE_MAX_ENTRIES = 5
+
+
+def cneuromod_bib_path(c):
+    """Path of the CNeuroMod reference list inside the cneuromod.all checkout."""
+    dataset = c.config.get("datasets")["cneuromod"]
+    dataset_dir = Path(dataset["output_dir"] if isinstance(dataset, dict) else dataset)
+    return dataset_dir / CNEUROMOD_BIB
+
+
+@task(help={
+    "smoke": f"Parse only the first {SMOKE_MAX_ENTRIES} entries, for a fast plumbing check.",
+})
+def run_citations(c, smoke=False):
     """
-    Run a small simulation.
+    Count papers using CNeuroMod data, by year and publication type.
 
-    Seeded, so a rerun reproduces the same numbers and the same figures —
-    pass --seed to draw a different sample.
-
-    Skipped when its output already exists — every run step caches that way, so
-    a repeated `invoke run` costs nothing. Use `invoke clean-simulation` (or
-    `invoke run --force`) to redo it.
+    Reads cneuromod_references.bib from the cneuromod.all checkout and writes
+    output_data/cneuromod_citations.csv (columns year, type, count). Skipped if
+    the CSV already exists. Never fetches: if the reference list is not on
+    disk, it stops and points at `invoke fetch`.
     """
-    from analysis.simulation import DEFAULT_SEED, simulation
+    from analysis.citations import parse_bib_to_table
 
-    output_dir = Path(c.config.get("output_data_dir"))
-    if (output_dir / "simulation_output.csv").is_file():
-        print("🫧 Skipping simulation (output exists)")
+    output_path = Path(c.config.get("output_data_dir")) / CITATIONS_CSV
+    if output_path.exists():
+        print(f"⏭️  {output_path} already exists — skipping (clean-citations to redo)")
         return
-    simulation(output_dir, seed=DEFAULT_SEED if seed is None else int(seed))
+
+    bib_path = cneuromod_bib_path(c)
+    if not bib_path.is_file():  # also catches an annexed file whose content was not retrieved
+        raise SystemExit(f"❌ {bib_path} is missing or has no content — run `invoke fetch` first.")
+
+    max_entries = SMOKE_MAX_ENTRIES if smoke else None
+    table = parse_bib_to_table(bib_path, max_entries=max_entries)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    table.to_csv(output_path, index=False)
+    print(f"📚 {table['count'].sum()} papers → {output_path}")
+
 
 def montage_dpi(c):
     """
@@ -76,7 +115,7 @@ def run_figure_layout(c):
     """
     Write every montage's panel geometry to figures_dir/panel_sizes.json.
 
-    Read by the notebook (see figure_simulation.ipynb) so every placed panel
+    Read by the notebooks (via airoh.figures.panel_size) so every placed panel
     renders at exactly the physical size the montage allocates it. Always
     re-runs, never skipped: it is cheap, and a box resized in Inkscape must
     take effect on the very next `invoke run`.
@@ -84,10 +123,10 @@ def run_figure_layout(c):
     from airoh.figures import figure_layout
     figure_layout(c)
 
-@task(pre=[run_simulation, run_figure_layout])
+@task(pre=[run_figure_layout])
 def run_notebooks(c):
     """
-    Generate figures from the simulation output using a notebook.
+    Execute the notebooks in notebooks/ and save their figures.
 
     `run-figure-layout` runs first because the notebook sizes its placed
     panels from the geometry it writes — and `clean-figures` wipes that file
@@ -134,7 +173,7 @@ def compose_figure(c):
 })
 def run(c, force=False):
     """
-    Full pipeline: simulation → figure layout → notebooks → composed figure.
+    Full pipeline: citations → figure layout → notebooks → composed figure.
 
     Steps are called directly rather than through `pre=`, so that flags like
     --force reach them: a `pre=` chain runs before this body, which would be
@@ -152,11 +191,11 @@ def run(c, force=False):
     if force:
         print("💥 --force: removing every computed output before running")
         clean(c)
-    run_simulation(c)
+    run_citations(c)
     run_figure_layout(c)
     run_notebooks(c)
     compose_figure(c)
-    record_run(c, tasks="run-simulation,run-figure-layout,run-notebooks,compose-figure")
+    record_run(c, tasks="run-citations,run-figure-layout,run-notebooks,compose-figure")
     print("all analyses completed")
 
 @task
@@ -167,12 +206,18 @@ def run_smoke(c):
     Calls the steps directly (rather than via `pre=`) so each can be given a
     reduced workload. The point is to exercise the plumbing quickly, not to
     produce real results.
+
+    Cleans computed outputs before and after: before, so cached outputs cannot
+    hide a broken step; after, so the reduced smoke outputs are never mistaken
+    for real ones by the next `invoke run` (which caches by existence).
     """
     fetch(c)
-    run_simulation(c)
+    clean(c)
+    run_citations(c, smoke=True)
     run_figure_layout(c)
     run_notebooks(c)
     compose_figure(c)
+    clean(c)
     print("✅ Smoke test complete.")
 
 @task(help={
@@ -194,12 +239,15 @@ def verify(c, skip=None, strict=False):
 # Clean
 # --------------------------------------------------------------------------- #
 @task
-def clean_simulation(c):
-    """
-    Remove the simulation outputs.
-    """
-    from airoh.utils import clean_folder
-    clean_folder(c, "output_data_dir", "*.csv")
+def clean_citations(c):
+    """Remove output_data/cneuromod_citations.csv, the output of run-citations."""
+    output_path = Path(c.config.get("output_data_dir")) / CITATIONS_CSV
+    if output_path.exists():
+        output_path.unlink()
+        print(f"🧹 Removed {output_path}")
+    else:
+        print(f"🫧 Skipping: {output_path} does not exist.")
+
 
 @task
 def clean_figures(c):
@@ -236,30 +284,35 @@ def clean(c):
     Calling `clean(c)` from Python — which is what `run --force` does — would
     otherwise execute an empty function and silently delete nothing.
     """
-    clean_simulation(c)
+    clean_citations(c)
     clean_figures(c)
     clean_figure(c)
 
 @task
-def clean_papers(c):
+def clean_cneuromod(c):
     """
-    Remove the 'papers' source asset (the downloaded or symlinked file).
+    Remove the 'cneuromod' source link (a symlink to an existing checkout).
 
     Not called by `clean` or `run --force` — those only touch output_data/.
-    Use this (or the umbrella `clean-source`) before `invoke fetch-papers` when
-    you need to point a stale symlink somewhere new: fetch never overwrites a
-    real file or existing symlink sitting at the destination.
+    Use this (or the umbrella `clean-source`) before `invoke fetch-cneuromod
+    --source ...` to re-point a stale symlink. A real clone is never deleted
+    here: cneuromod.all is also a write target, so it may hold work that is not
+    pushed yet. Remove such a checkout by hand if you really mean to.
     """
-    papers_file = Path(c.config.get("files")["papers"]["output_file"])
-    if papers_file.is_symlink() or papers_file.exists():
-        papers_file.unlink()
-        print(f"🧹 Removed: {papers_file}")
+    dataset = c.config.get("datasets")["cneuromod"]
+    dataset_dir = Path(dataset["output_dir"] if isinstance(dataset, dict) else dataset)
+    if dataset_dir.is_symlink():
+        dataset_dir.unlink()
+        print(f"🧹 Removed link: {dataset_dir}")
+    elif dataset_dir.exists():
+        print(f"⚠️  {dataset_dir} is a real checkout, not a link: left untouched "
+              "(it may hold unpushed work). Remove it by hand if you are sure.")
     else:
-        print(f"🫧 Skipping: {papers_file} does not exist.")
+        print(f"🫧 Skipping: {dataset_dir} does not exist.")
 
 @task
 def clean_source(c):
     """
     Remove all source data assets. Body calls each clean-{name} task.
     """
-    clean_papers(c)
+    clean_cneuromod(c)

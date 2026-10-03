@@ -2,3 +2,8 @@
 
 # Provenance is tracked: it records what the inputs actually were.
 !MANIFEST.json
+
+# cneuromod.all is its own repository (a clone or a symlink to one), never
+# part of this one. It is both a source and a write target, so it must not be
+# tracked here, nor mistaken for a nested repo.
+cneuromod.all

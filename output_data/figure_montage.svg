@@ -1,13 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-     width="120mm" height="60mm" viewBox="0 0 120 60">
+     width="180mm" height="90mm" viewBox="0 0 180 90">
   <!-- Hand-authored montage: this SVG is the single source of truth for panel
        layout (see CLAUDE.md, "Figures: the Inkscape montage pattern"). Each
-       <image> below links a notebook panel by relative path and the box it is
-       placed in is that panel's true on-page size — resize a box here in
-       Inkscape and the next `invoke run` regenerates that panel at the new
-       size, with text never stretched. -->
-  <image xlink:href="figures/figure_simulation/scatter.png"
-         x="0" y="5" width="70" height="50" />
-  <image xlink:href="figures/figure_simulation/histogram.png"
-         x="75" y="15" width="40" height="30" />
+       <image> below links a notebook panel by relative path, and the box it is
+       placed in is that panel's true on-page size: resize a box here in
+       Inkscape, then `invoke clean-figures && invoke run` to redraw it. -->
+  <image xlink:href="figures/cneuromod_citations/citations_by_year.png"
+         x="0" y="0" width="180" height="90" />
 </svg>

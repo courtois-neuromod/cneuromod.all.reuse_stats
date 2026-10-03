@@ -1,75 +1,68 @@
 {
-  "command": "/home/pbellec/git/airoh-mini/.venv/bin/invoke run",
+  "command": "/home/pbellec/git/cneuromod.all.reuse_stats/.venv/bin/invoke run",
   "environment": {
     "lockfiles": {
-      "environment.yml": "240993e42bc3a5a080735b449232ef6020f855afbd236f3330f5bf5ce44ad1be",
-      "requirements.txt": "66b0ee34be504a33a639c8b01da85c08f5ffcc4a199f601223a2a628794465d0",
-      "uv.lock": "79d3fe111a48b0597cb5360ee5a63f9e802f8f08ebcbb51b55249292ce6c7b11"
+      "uv.lock": "01850e7461648e0b4eb7d5ceb3e6a657f39b44b558cc21ff04b708dc2bcf5bdc"
     },
     "packages": {
       "airoh": "0.5.0",
+      "git-annex": "10.20260901.post1",
       "invoke": "3.0.3",
       "jupyter": "1.1.1",
       "matplotlib": "3.10.9",
       "nbconvert": "7.17.1",
       "pandas": "3.0.2",
-      "requests": "2.33.1"
+      "pytest": "9.1.1",
+      "requests": "2.33.1",
+      "ruff": "0.16.10"
     },
-    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
     "python": "3.14.0"
   },
   "inputs": {
     "assets": {
-      "papers": {
-        "commit": null,
-        "resolved_path": "/home/pbellec/git/airoh-mini/source_data/YNIMG_BrainParcellation_summary.tsv",
-        "sha256": "6eee27eb7ef7d280aa3ae5173e1e2abbb9c06ecfd77e99d2b0d7821633da16de"
+      "cneuromod": {
+        "commit": "7fa33802541832db18ae23960ec0560cb83061a1",
+        "resolved_path": "/home/pbellec/git/cneuromod.all",
+        "sha256": null
       }
     },
     "manifest_file": "source_data/MANIFEST.json",
-    "manifest_sha256": "0e29388df0642de2753c4994b85f3f570e54281988f01a6851def421460a6256"
+    "manifest_sha256": "46d81cb435a31f839986911305eb2d52c26d3956698b0f9c5e9b5e12d06b143a"
   },
   "outputs": {
+    "cneuromod_citations.csv": {
+      "sha256": "307d451d754b8fe20c4e72fcc0e01b633c667259e14ef15963bd69303d258e67",
+      "size_bytes": 327
+    },
     "figure_montage.png": {
-      "sha256": "cf882a4451ed2327a270aa58957d2c8dd36d83432f9686a60b23c9049af4bcd1",
-      "size_bytes": 47019
+      "sha256": "645d0666c87c43b83ce27d27de7e20ce110f710cbccacb7b1235c2d96d4d7fe1",
+      "size_bytes": 187710
     },
     "figure_montage.svg": {
-      "sha256": "630c4ad8e50546071c596cbf8d1becf859abf57a792e8466ef43de100b75e0b6",
-      "size_bytes": 794
+      "sha256": "a6dd297009632d79fe03f089f582c701b5691cd43547e8e601e91358c2b28819",
+      "size_bytes": 651
     },
-    "figures/figure_simulation/histogram.png": {
-      "sha256": "04119ea7b302f8ab8f64054d3c26b250769a88bfa8b1a8302b25057205b25d10",
-      "size_bytes": 11361
-    },
-    "figures/figure_simulation/scatter.png": {
-      "sha256": "9d870a5a26d607953029646111fd155cffc00521103db9c6fc7d4e1b0cf0eb70",
-      "size_bytes": 17530
+    "figures/cneuromod_citations/citations_by_year.png": {
+      "sha256": "d95a6acecd8f7e83630b9817b2f53c907e753a13fb34f689bf8be64a6ab2886a",
+      "size_bytes": 98199
     },
     "figures/panel_sizes.json": {
-      "sha256": "0cf8f2f7117147be054ead5e34a884806ccee40315e76965853937a0df51e590",
-      "size_bytes": 127
-    },
-    "figures/summary/authors.csv": {
-      "sha256": "3bb51140343a796ae2b20c389345595b940828136d9232b8c325e25e0e6f87a3",
-      "size_bytes": 340
-    },
-    "simulation_output.csv": {
-      "sha256": "ed2f89d7873468b3d0d1a3fcb8a61121d6405f4fdb0e7d647c8adedc1af90586",
-      "size_bytes": 114
+      "sha256": "a4af9151ba5014e88ae5b9f82d78b7e414919880221f06ec5550130e746ab74d",
+      "size_bytes": 77
     }
   },
-  "recorded_at": "2026-08-04T14:19:14+00:00",
+  "recorded_at": "2026-10-03T17:19:59+00:00",
   "repository": {
-    "branch": "figures-example",
-    "commit": "45b4c9df7e2c221e75446d36a7fb21ab5aaba82f",
+    "branch": "main",
+    "commit": "ad4c7e593a41f0d17bb0e9be9e3f9f73ed481008",
     "dirty": true,
-    "remote": "git@github.com:airoh-pipeline/airoh-mini.git",
-    "toplevel": "/home/pbellec/git/airoh-mini"
+    "remote": "git@github.com:courtois-neuromod/cneuromod.all.reuse_stats.git",
+    "toplevel": "/home/pbellec/git/cneuromod.all.reuse_stats"
   },
   "schema": "airoh/provenance/1",
   "tasks": [
-    "run-simulation",
+    "run-citations",
     "run-figure-layout",
     "run-notebooks",
     "compose-figure"

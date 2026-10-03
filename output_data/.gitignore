@@ -5,5 +5,9 @@
 # tracked) and regenerated on every run — no need to also track it.
 figures/panel_sizes.json
 
+# The composed figure is small (~200 KB) and shown in README.md, so it is
+# tracked; the per-notebook panels stay ignored.
+!figure_montage.png
+
 # Provenance is a tracked output: it records what produced everything else.
 !PROVENANCE.json

@@ -1,24 +1,10 @@
-# 📁 Source Data Contents
+# Source Data
 
-After `invoke fetch` is complete, expect the following content:
+Populated by `invoke fetch`.
 
-- `YNIMG_BrainParcellation_summary.tsv` — a spreadsheet with some data on a
-  series of articles, downloaded from figshare.
-- `MANIFEST.json` — what each declared asset actually resolved to: the URL or
-  the real path behind a symlink, its size and checksum, and the commit of the
-  repository it belongs to when it has one. Written by `invoke fetch`.
+- `cneuromod.all/`: the [cneuromod.all](https://github.com/courtois-neuromod/cneuromod.all) datalad superdataset. It is either a `datalad clone` or a symlink to an existing checkout (`invoke fetch --cneuromod-source <path>`). It is gitignored and never tracked here. It is also a future write target, so `clean-cneuromod` only ever removes a symlink, never a real clone. Only two annexed files are retrieved; the imaging subdatasets are not installed:
+  - `source_data/cneuromod.all/docs/source/cneuromod_references.bib`: the curated list of papers using CNeuroMod data (BibTeX). This is read by `run-citations`.
+  - `source_data/cneuromod.all/docs/source/cneuromod_references.json`: metadata for that list (search date, search sources and queries, curation method). This is retrieved but not read yet.
+- `MANIFEST.json`: written by `fetch`. Records what each asset resolved to, including the commit of a symlinked checkout. Git-tracked.
 
-📝 Note: tsv files are **ignored by Git** (see `.gitignore`), so data assets
-won't be tracked by default. `MANIFEST.json` is the deliberate exception — it is
-the record of which inputs a run consumed.
-
-📝 Note: assets here may be **symlinks** to data that already lives elsewhere on
-disk, rather than local copies — this happens when a fetch task is run with
-`--source` (e.g. `invoke fetch-papers --source /path`, or `invoke fetch
---papers-source /path`), or a `source:` key is set in `invoke.yaml`. The manifest
-records what the link pointed at, so a symlinked input stays identifiable.
-
-📝 Note: if this project's data is sensitive, restricted, or needs credentials to
-retrieve, say so here — a collaborator whose `fetch` came back empty needs to
-know whether the pipeline is broken or they simply lack access. See CLAUDE.md,
-"Sensitive and restricted data".
+**Access:** both reference files are public. If `fetch` warns that a file could not be retrieved, check your network and your `git-annex` version (the `git-annex` package in `pyproject.toml` provides a recent one).
