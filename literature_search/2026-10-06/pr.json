@@ -1,0 +1,9 @@
+{
+  "branch": "references/2026-10-06",
+  "commit": "376749af08a5fab856566677ae6951b6aa1745d4",
+  "pr_url": "https://github.com/courtois-neuromod/cneuromod.all/pull/53",
+  "dry_run": false,
+  "entries": [
+    "10.48550/arxiv.2605.29850"
+  ]
+}
