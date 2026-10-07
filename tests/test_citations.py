@@ -52,6 +52,8 @@ def bib_path(tmp_path):
     ("INPROCEEDINGS", {}, "Conference"),
     ("INCOLLECTION", {}, "Book Chapter"),
     ("MISC", {}, "Other"),
+    ("MISC", {"publisher": "arXiv"}, "Preprint"),
+    ("MISC", {"publisher": "Zenodo"}, "Other"),
 ])
 def test_classify_entry(entry_type, fields, expected):
     assert classify_entry(entry_type, fields) == expected

@@ -32,30 +32,30 @@
   },
   "outputs": {
     "cneuromod_citations.csv": {
-      "sha256": "284adb5b254aca33f2404368a2b1c9bf0d585d2c5d15c760561740196f5d2368",
-      "size_bytes": 340
+      "sha256": "1ad3a48b0f2e89510cc2714dc45de71834f807febe43d08590c7d8d26ec7c05b",
+      "size_bytes": 327
     },
     "figure_montage.png": {
-      "sha256": "4fed749a8fc81f44066c28f5d0754a370cfe761ed748eedb6dbda16ce99555fa",
-      "size_bytes": 191995
+      "sha256": "2328c2f8385ce584db283778e723ced82e5f2be6df70588ffeed72f1e2f70d5e",
+      "size_bytes": 188582
     },
     "figure_montage.svg": {
       "sha256": "a6dd297009632d79fe03f089f582c701b5691cd43547e8e601e91358c2b28819",
       "size_bytes": 651
     },
     "figures/cneuromod_citations/citations_by_year.png": {
-      "sha256": "d58391ded9e56c219dc819991c4b87d32d645f0479324b27ec532726d68e34ba",
-      "size_bytes": 101297
+      "sha256": "2df6555ced389cf60e46cc50bafda5a7eea9f5167b32f0f94f72f317b5493720",
+      "size_bytes": 98693
     },
     "figures/panel_sizes.json": {
       "sha256": "a4af9151ba5014e88ae5b9f82d78b7e414919880221f06ec5550130e746ab74d",
       "size_bytes": 77
     }
   },
-  "recorded_at": "2026-10-07T00:28:09+00:00",
+  "recorded_at": "2026-10-07T00:29:52+00:00",
   "repository": {
     "branch": "main",
-    "commit": "978171d06890f676dcceaee991d9e87c4b0d8420",
+    "commit": "daf04fe3d4ed7d2408b977631dd49b93179ef01b",
     "dirty": true,
     "remote": "git@github.com:courtois-neuromod/cneuromod.all.reuse_stats.git",
     "toplevel": "/home/pbellec/git/cneuromod.paper/source_data/reuse_stats"

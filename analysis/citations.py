@@ -23,18 +23,22 @@ _TYPE_BY_ENTRY = {
 def classify_entry(entry_type: str, fields: dict) -> str:
     """Publication type of one entry: Journal, Preprint, Conference, Thesis, Book Chapter, Other.
 
-    Only ARTICLE entries need a closer look: reference managers file preprints,
-    theses and conference papers as articles, so the venue fields decide.
+    ARTICLE entries need a closer look: reference managers file preprints,
+    theses and conference papers as articles, so the venue fields decide. MISC
+    entries are preprints when the venue is a preprint server (DOI-resolved arXiv
+    records come as MISC with publisher arXiv), and Other otherwise.
     """
     entry_type = entry_type.upper()
     if entry_type in _TYPE_BY_ENTRY:
         return _TYPE_BY_ENTRY[entry_type]
-    if entry_type != "ARTICLE":
+    if entry_type not in ("ARTICLE", "MISC"):
         return "Other"
 
     venue = " ".join(fields.get(key, "") for key in ("journal", "institution", "publisher"))
     if _PREPRINT.search(venue):
         return "Preprint"
+    if entry_type == "MISC":
+        return "Other"
     if _THESIS.search(venue):
         return "Thesis"
     if _CONFERENCE.search(venue):
