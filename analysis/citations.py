@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
-_PREPRINT = re.compile(r"biorxiv|arxiv|psyarxiv", re.IGNORECASE)
+# openRxiv is the publisher doi.org reports for bioRxiv and medRxiv DOIs (prefix 10.64898).
+_PREPRINT = re.compile(r"biorxiv|medrxiv|openrxiv|arxiv|psyarxiv", re.IGNORECASE)
 _THESIS = re.compile(
     r"scholaris|theses\.hal|repozitorij|teses\.|umontreal\.ca|thesis", re.IGNORECASE
 )

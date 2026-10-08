@@ -45,6 +45,7 @@ def bib_path(tmp_path):
 @pytest.mark.parametrize("entry_type, fields, expected", [
     ("ARTICLE", {"journal": "Sci. Data"}, "Journal"),
     ("ARTICLE", {"journal": "bioRxiv"}, "Preprint"),
+    ("ARTICLE", {"publisher": "openRxiv"}, "Preprint"),
     ("ARTICLE", {"publisher": "theses.hal.science"}, "Thesis"),
     ("ARTICLE", {"journal": "openreview.net"}, "Conference"),
     ("PHDTHESIS", {}, "Thesis"),
