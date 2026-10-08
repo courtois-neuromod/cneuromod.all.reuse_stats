@@ -22,40 +22,40 @@
   "inputs": {
     "assets": {
       "cneuromod": {
-        "commit": "11b0b2e8662976c3d9a5616db0fd21a9b396dcd3",
+        "commit": "b663b2168c7bcc0382bb87681f503520f37c40bc",
         "resolved_path": "/home/pbellec/git/cneuromod.paper/source_data/cneuromod.all",
         "sha256": null
       }
     },
     "manifest_file": "source_data/MANIFEST.json",
-    "manifest_sha256": "30c04b2eb50c7fdb095f791827a273346a35b9a09030048d48a08b08082687ad"
+    "manifest_sha256": "7e8ff3739dec60813f48970cad7b02649636ed931388a4dcdf1f4ffd5b8b9f4b"
   },
   "outputs": {
     "cneuromod_citations.csv": {
-      "sha256": "11c3d2c80e8879a8b8d38103f373c17960de6b75661bc3926df41292b551ee1f",
+      "sha256": "72e6d5350256e1031aa5a96951f08f7596a3b2aadcb74a1a1c81afbefae74e0d",
       "size_bytes": 328
     },
     "figure_montage.png": {
-      "sha256": "089c865af5a6771c3e0e957e1de8f7c664e408957d3eb0a11958099ff90445a6",
-      "size_bytes": 187676
+      "sha256": "2aece640fef464e6a5ba5e54e10e9a72d9fbec0b44251ab2e14d263f73ed4ed8",
+      "size_bytes": 187635
     },
     "figure_montage.svg": {
       "sha256": "a6dd297009632d79fe03f089f582c701b5691cd43547e8e601e91358c2b28819",
       "size_bytes": 651
     },
     "figures/cneuromod_citations/citations_by_year.png": {
-      "sha256": "4e6e4734e7c6243651b9a8f3ab250718fb58ed1f6259a49c636da000c6b195e4",
-      "size_bytes": 98066
+      "sha256": "cf5345647364bc94cf7f9ba6cf90bae9cc5c8908d629a47e102dabab9e770edf",
+      "size_bytes": 98257
     },
     "figures/panel_sizes.json": {
       "sha256": "a4af9151ba5014e88ae5b9f82d78b7e414919880221f06ec5550130e746ab74d",
       "size_bytes": 77
     }
   },
-  "recorded_at": "2026-10-08T05:47:06+00:00",
+  "recorded_at": "2026-10-08T09:24:42+00:00",
   "repository": {
     "branch": "main",
-    "commit": "1ff6b8624debb053ed1e67e3c2b5467a3ff732ca",
+    "commit": "3a3e42e38f58cb2ef549f6540f30347402f0220b",
     "dirty": true,
     "remote": "git@github.com:courtois-neuromod/cneuromod.all.reuse_stats.git",
     "toplevel": "/home/pbellec/git/cneuromod.paper/source_data/reuse_stats"

@@ -6,7 +6,7 @@
       "exists": true,
       "git": {
         "branch": "HEAD",
-        "commit": "11b0b2e8662976c3d9a5616db0fd21a9b396dcd3",
+        "commit": "b663b2168c7bcc0382bb87681f503520f37c40bc",
         "dirty": false,
         "remote": "https://github.com/courtois-neuromod/cneuromod.all",
         "toplevel": "/home/pbellec/git/cneuromod.paper/source_data/cneuromod.all"
@@ -20,6 +20,6 @@
       "size_bytes": null
     }
   },
-  "recorded_at": "2026-10-08T05:47:02+00:00",
+  "recorded_at": "2026-10-08T09:24:38+00:00",
   "schema": "airoh/manifest/1"
 }
